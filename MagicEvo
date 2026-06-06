@@ -1,0 +1,428 @@
+-- LocalScript inside StarterPlayerScripts or StarterGui
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Chstrr0GUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player.PlayerGui
+
+-- Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 370, 0, 310)
+frame.Position = UDim2.new(0.5, -185, 0.5, -155)
+frame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+
+-- Title bar
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 28)
+title.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+title.BorderSizePixel = 0
+title.Text = "heso"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
+title.Parent = frame
+Instance.new("UICorner", title).CornerRadius = UDim.new(0, 10)
+
+-- Minimize button
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 24, 0, 20)
+minBtn.Position = UDim2.new(1, -54, 0, 4)
+minBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+minBtn.BorderSizePixel = 0
+minBtn.Text = "—"
+minBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 10
+minBtn.Parent = frame
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 5)
+
+-- Destroy button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 24, 0, 20)
+closeBtn.Position = UDim2.new(1, -26, 0, 4)
+closeBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "✕"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 10
+closeBtn.Parent = frame
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 5)
+
+-- Content frame
+local content = Instance.new("Frame")
+content.Size = UDim2.new(1, 0, 1, -28)
+content.Position = UDim2.new(0, 0, 0, 28)
+content.BackgroundTransparency = 1
+content.Parent = frame
+
+-- Minimize logic
+local minimized = false
+minBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        content.Visible = false
+        frame.Size = UDim2.new(0, 370, 0, 28)
+        minBtn.Text = "▢"
+    else
+        content.Visible = true
+        frame.Size = UDim2.new(0, 370, 0, 310)
+        minBtn.Text = "—"
+    end
+end)
+
+-- Destroy logic
+closeBtn.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- Helpers
+local function makeSection(text, x, y)
+    local s = Instance.new("TextLabel")
+    s.Size = UDim2.new(0, 160, 0, 13)
+    s.Position = UDim2.new(0, x, 0, y)
+    s.BackgroundTransparency = 1
+    s.Text = text
+    s.TextColor3 = Color3.fromRGB(110, 110, 110)
+    s.Font = Enum.Font.GothamBold
+    s.TextSize = 9
+    s.TextXAlignment = Enum.TextXAlignment.Left
+    s.Parent = content
+end
+
+local function makeToggle(labelText, x, y, callback)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 105, 0, 22)
+    label.Position = UDim2.new(0, x, 0, y)
+    label.BackgroundTransparency = 1
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(190, 190, 190)
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 10
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = content
+
+    local switchBg = Instance.new("Frame")
+    switchBg.Size = UDim2.new(0, 40, 0, 20)
+    switchBg.Position = UDim2.new(0, x + 108, 0, y + 1)
+    switchBg.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    switchBg.BorderSizePixel = 0
+    switchBg.Parent = content
+    Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
+
+    local knob = Instance.new("Frame")
+    knob.Size = UDim2.new(0, 14, 0, 14)
+    knob.Position = UDim2.new(0, 3, 0.5, -7)
+    knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    knob.BorderSizePixel = 0
+    knob.Parent = switchBg
+    Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency = 1
+    btn.Text = ""
+    btn.Parent = switchBg
+
+    local isOn = false
+    btn.MouseButton1Click:Connect(function()
+        isOn = not isOn
+        if isOn then
+            switchBg.BackgroundColor3 = Color3.fromRGB(0, 190, 75)
+            knob:TweenPosition(UDim2.new(0, 23, 0.5, -7), "Out", "Quad", 0.15, true)
+        else
+            switchBg.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+            knob:TweenPosition(UDim2.new(0, 3, 0.5, -7), "Out", "Quad", 0.15, true)
+        end
+        callback(isOn)
+    end)
+end
+
+local function makeHDiv(x, y, w)
+    local d = Instance.new("Frame")
+    d.Size = UDim2.new(0, w, 0, 1)
+    d.Position = UDim2.new(0, x, 0, y)
+    d.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    d.BorderSizePixel = 0
+    d.Parent = content
+end
+
+-- Vertical divider
+local vDiv = Instance.new("Frame")
+vDiv.Size = UDim2.new(0, 1, 0, 282)
+vDiv.Position = UDim2.new(0, 185, 0, 0)
+vDiv.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+vDiv.BorderSizePixel = 0
+vDiv.Parent = content
+
+-- ── LEFT COLUMN ───────────────────────────────────────
+
+makeSection("ZONE", 10, 8)
+local winLoop = nil
+local targetCFrame = CFrame.new(1914.4658203125, 7.282691955566406, 1.966896653175354)
+makeToggle("Auto Win Zone", 10, 22, function(on)
+    if on then
+        winLoop = RunService.Heartbeat:Connect(function()
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                char.HumanoidRootPart.CFrame = targetCFrame
+            end
+        end)
+    else
+        if winLoop then winLoop:Disconnect(); winLoop = nil end
+    end
+end)
+
+makeHDiv(10, 52, 170)
+
+makeSection("EGG", 10, 58)
+local eggActive = false
+local eggCFrame = CFrame.new(-41.931488037109375, 5.125024318695068, -55.51643371582031)
+local eggLoop = nil
+makeToggle("Auto Best Egg", 10, 72, function(on)
+    eggActive = on
+    if on then
+        eggLoop = RunService.Heartbeat:Connect(function()
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                char.HumanoidRootPart.CFrame = eggCFrame
+            end
+        end)
+        task.spawn(function()
+            while eggActive do
+                pcall(function()
+                    local remote = ReplicatedStorage:WaitForChild("Remotes", 5):WaitForChild("OpenEgg", 5)
+                    if remote then remote:InvokeServer("Astral Egg") end
+                end)
+                task.wait(0.1)
+            end
+        end)
+    else
+        if eggLoop then eggLoop:Disconnect(); eggLoop = nil end
+    end
+end)
+
+makeHDiv(10, 102, 170)
+
+makeSection("PETS", 10, 108)
+local equipActive = false
+makeToggle("Auto Equip Pets", 10, 122, function(on)
+    equipActive = on
+    if on then
+        task.spawn(function()
+            while equipActive do
+                pcall(function()
+                    local remote = ReplicatedStorage:WaitForChild("Remotes", 5):WaitForChild("EquipBestPets", 5)
+                    if remote then remote:FireServer() end
+                end)
+                task.wait(1)
+            end
+        end)
+    end
+end)
+
+makeHDiv(10, 152, 170)
+
+makeSection("REBIRTH", 10, 158)
+local rebirthActive = false
+makeToggle("Auto Rebirth", 10, 172, function(on)
+    rebirthActive = on
+    if on then
+        task.spawn(function()
+            while rebirthActive do
+                pcall(function()
+                    local remote = ReplicatedStorage:WaitForChild("Remotes", 5):WaitForChild("Rebirth", 5)
+                    if remote then remote:FireServer() end
+                end)
+                task.wait(1)
+            end
+        end)
+    end
+end)
+
+makeHDiv(10, 202, 170)
+
+makeSection("CLICKER", 10, 208)
+local clickerActive = false
+makeToggle("OP Clicker", 10, 222, function(on)
+    clickerActive = on
+    if on then
+        task.spawn(function()
+            while clickerActive do
+                pcall(function()
+                    local remote = ReplicatedStorage:WaitForChild("Remotes", 5):WaitForChild("GainMagicPower", 5)
+                    if remote then remote:FireServer() end
+                end)
+                task.wait(0.02)
+            end
+        end)
+    end
+end)
+
+-- ── RIGHT COLUMN — TRAIN ──────────────────────────────
+
+makeSection("TRAIN LOCATION", 195, 8)
+
+-- ↓ CHANGE TRAIN ZONES HERE
+local trainPositions = {
+    ["2x Power"]  = CFrame.new(9.508988380432129,   4.683034420013428, -34.22232437133789),
+    ["5x Power"]  = CFrame.new(-12.534440040588379, 5.009988784790039, -39.04243850708008),
+    ["10x Power"] = CFrame.new(29.299985885620117,  4.683034896850586, -59.210044860839844),
+    ["50x Power"] = CFrame.new(6.380734920501709,   4.683034420013428, -55.88126754760742),
+}
+local trainOrder = {"2x Power", "5x Power", "10x Power", "50x Power"}
+-- ↑ CHANGE TRAIN ZONES HERE
+
+local trainLoop = nil
+local activeTrainBtn = nil
+local trainBtns = {}
+
+local trainGridPos = {
+    {195, 24}, {280, 24},
+    {195, 50}, {280, 50},
+}
+
+for i, name in ipairs(trainOrder) do
+    local px = trainGridPos[i][1]
+    local py = trainGridPos[i][2]
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 78, 0, 20)
+    btn.Position = UDim2.new(0, px, 0, py)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.BorderSizePixel = 0
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 9
+    btn.Parent = content
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+    trainBtns[name] = btn
+
+    btn.MouseButton1Click:Connect(function()
+        if activeTrainBtn == btn then
+            btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+            if trainLoop then trainLoop:Disconnect(); trainLoop = nil end
+            activeTrainBtn = nil
+        else
+            for _, b in pairs(trainBtns) do
+                b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                b.TextColor3 = Color3.fromRGB(160, 160, 160)
+            end
+            btn.BackgroundColor3 = Color3.fromRGB(0, 150, 60)
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            activeTrainBtn = btn
+            if trainLoop then trainLoop:Disconnect(); trainLoop = nil end
+            local cf = trainPositions[name]
+
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local humanoid = char:FindFirstChildOfClass("Humanoid")
+                if humanoid then humanoid.WalkSpeed = 0 end
+                task.wait(0.05)
+                char.HumanoidRootPart.CFrame = cf
+                task.wait(0.05)
+                if humanoid then humanoid.WalkSpeed = 16 end
+            end
+
+            trainLoop = RunService.Heartbeat:Connect(function()
+                local c = player.Character
+                if c and c:FindFirstChild("HumanoidRootPart") then
+                    c.HumanoidRootPart.CFrame = cf
+                end
+            end)
+        end
+    end)
+end
+
+-- ── RIGHT COLUMN — STAFF EQUIP ────────────────────────
+
+makeHDiv(195, 80, 160)
+makeSection("STAFF EQUIP", 195, 86)
+
+-- ↓ CHANGE STAFF LOCATIONS HERE
+local staffPositions = {
+    ["Staff 15"] = CFrame.new(-30.450603485107422, 1.7950035333633423, 44.206146240234375),
+    ["Staff 16"] = CFrame.new(-42.45060348510742,  1.7950035333633423, 44.206146240234375),
+    ["Staff 17"] = CFrame.new(-54.45060348510742,  1.7950035333633423, 44.206146240234375),
+    ["Staff 18"] = CFrame.new(-66.45059967041016,  1.7950035333633423, 44.206146240234375),
+}
+local staffOrder = {"Staff 15", "Staff 16", "Staff 17", "Staff 18"}
+-- ↑ CHANGE STAFF LOCATIONS HERE
+
+local staffGridPos = {
+    {195, 102}, {280, 102},
+    {195, 128}, {280, 128},
+}
+
+local activeStaffBtn = nil
+local staffBtns = {}
+
+for i, name in ipairs(staffOrder) do
+    local px = staffGridPos[i][1]
+    local py = staffGridPos[i][2]
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 78, 0, 20)
+    btn.Position = UDim2.new(0, px, 0, py)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.BorderSizePixel = 0
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 9
+    btn.Parent = content
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+    staffBtns[name] = btn
+
+    btn.MouseButton1Click:Connect(function()
+        if activeStaffBtn == btn then
+            btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+            activeStaffBtn = nil
+        else
+            for _, b in pairs(staffBtns) do
+                b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                b.TextColor3 = Color3.fromRGB(160, 160, 160)
+            end
+            btn.BackgroundColor3 = Color3.fromRGB(100, 60, 200)
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            activeStaffBtn = btn
+
+            task.spawn(function()
+                local char = player.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local humanoid = char:FindFirstChildOfClass("Humanoid")
+
+                    -- Save original position BEFORE tp
+                    local originalCF = char.HumanoidRootPart.CFrame
+
+                    -- Freeze, tp to staff, wait for equip, tp back
+                    if humanoid then humanoid.WalkSpeed = 0 end
+                    task.wait(0.05)
+                    char.HumanoidRootPart.CFrame = staffPositions[name]
+                    task.wait(0.3) -- wait for equip to register
+                    char.HumanoidRootPart.CFrame = originalCF -- tp back
+                    task.wait(0.05)
+                    if humanoid then humanoid.WalkSpeed = 16 end
+
+                    -- Deselect button after done
+                    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                    btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+                    activeStaffBtn = nil
+                end
+            end)
+        end
+    end)
+end
